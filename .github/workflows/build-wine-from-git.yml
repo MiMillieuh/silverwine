@@ -26,6 +26,17 @@ jobs:
     - name: Clone Wine
       run: git clone git://source.winehq.org/git/wine.git ~/wine-dirs/wine
 
+    - name: Extract Wine Version
+      id: wine_version
+      run: |
+        VERSION=$(cat ~/wine-dirs/wine/VERSION | sed 's/Wine version //')  # Enlève "Wine version " du contenu
+        echo "Extracted version: $VERSION"
+        if [ -z "$VERSION" ]; then
+          echo "Failed to extract Wine version."
+          exit 1
+        fi
+        echo "::set-output name=version::$VERSION"
+
     - name: Build Wine64
       run: |
         mkdir ~/wine64
@@ -41,17 +52,6 @@ jobs:
         PKG_CONFIG_PATH=/usr/lib/pkgconfig ../wine-dirs/wine/configure CFLAGS="-march=native -O3 -pipe -fstack-protector-strong -I/usr/include/freetype2 -I/usr/lib/glib-2.0/include -I/usr/include/glib-2.0 -I/usr/include/gstreamer-1.0" --with-wine64=../wine64
         make -j$(nproc)
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
-
-    - name: Extract Wine Version
-      id: wine_version
-      run: |
-        VERSION=$(cat ~/wine-dirs/wine/VERSION | sed 's/Wine version //')  # Enlève "Wine version " du contenu
-        echo "Extracted version: $VERSION"
-        if [ -z "$VERSION" ]; then
-          echo "Failed to extract Wine version."
-          exit 1
-        fi
-        echo "::set-output name=version::$VERSION"
 
     - name: Print Wine Version
       run: echo "Wine version is ${{ steps.wine_version.outputs.version }}"
