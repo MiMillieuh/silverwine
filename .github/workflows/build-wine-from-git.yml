@@ -45,13 +45,17 @@ jobs:
         echo "::set-output name=tag::$LATEST_RELEASE_TAG"
 
     - name: Compare Versions
+      id: compare_versions
       run: |
         if [ "${{ steps.wine_version.outputs.version }}" = "${{ steps.latest_release.outputs.tag }}" ]; then
-          echo "Version is the same as the latest release. Stopping workflow."
-          exit 78
+          echo "Version is the same as the latest release."
+          echo "::set-output name=should_skip::true"
+        else
+          echo "::set-output name=should_skip::false"
         fi
 
     - name: Build Wine64
+      if: needs.compare_versions.outputs.should_skip == 'false'
       run: |
         mkdir ~/wine64
         cd ~/wine64
@@ -60,6 +64,7 @@ jobs:
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
 
     - name: Build Wine32
+      if: needs.compare_versions.outputs.should_skip == 'false'
       run: |
         mkdir ~/wine32
         cd ~/wine32
@@ -67,10 +72,8 @@ jobs:
         make -j$(nproc)
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
 
-    - name: Print Wine Version
-      run: echo "Wine version is ${{ steps.wine_version.outputs.version }}"
-
     - name: Package Wine
+      if: needs.compare_versions.outputs.should_skip == 'false'
       run: |
         cd ~/
         tar -czvf wine-${{ steps.wine_version.outputs.version }}-x86_64.tar.gz -C ~/finalbuild/usr/local .        
@@ -79,6 +82,7 @@ jobs:
 
 
     - name: Create Release
+      if: needs.compare_versions.outputs.should_skip == 'false'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -96,6 +100,7 @@ jobs:
         ls /home/runner/finalbuild
 
     - name: Upload Wine as Release Asset
+      if: needs.compare_versions.outputs.should_skip == 'false'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
