@@ -37,6 +37,20 @@ jobs:
         fi
         echo "::set-output name=version::$VERSION"
 
+    - name: Get Latest Release Version
+      id: latest_release
+      run: |
+        LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name')
+        echo "Latest release tag: $LATEST_RELEASE_TAG"
+        echo "::set-output name=tag::$LATEST_RELEASE_TAG"
+
+    - name: Compare Versions
+      run: |
+        if [ "${{ steps.wine_version.outputs.version }}" = "${{ steps.latest_release.outputs.tag }}" ]; then
+          echo "Version is the same as the latest release. Stopping workflow."
+          exit 78
+        fi
+
     - name: Build Wine64
       run: |
         mkdir ~/wine64
