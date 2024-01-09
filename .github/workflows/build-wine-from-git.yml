@@ -61,7 +61,7 @@ jobs:
         
 
     - name: Build Wine64
-      if: needs.compare_versions.outputs.should_skip == 'false'
+      if: steps.compare_versions.outputs.should_skip == 'false'
       run: |
         mkdir ~/wine64
         cd ~/wine64
@@ -71,7 +71,7 @@ jobs:
         
 
     - name: Build Wine32
-      if: needs.compare_versions.outputs.should_skip == 'false'
+      if: steps.compare_versions.outputs.should_skip == 'false'
       run: |
         mkdir ~/wine32
         cd ~/wine32
@@ -80,7 +80,7 @@ jobs:
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
 
     - name: Package Wine
-      if: needs.compare_versions.outputs.should_skip == 'false'
+      if: steps.compare_versions.outputs.should_skip == 'false'
       run: |
         cd ~/
         tar -czvf wine-${{ steps.wine_version.outputs.version }}-x86_64.tar.gz -C ~/finalbuild/usr/local .        
@@ -89,7 +89,7 @@ jobs:
 
 
     - name: Create Release
-      if: needs.compare_versions.outputs.should_skip == 'false'
+      if: steps.compare_versions.outputs.should_skip == 'false'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -102,7 +102,7 @@ jobs:
         
 
     - name: Upload Wine as Release Asset
-      if: needs.compare_versions.outputs.should_skip == 'false'
+      if: steps.compare_versions.outputs.should_skip == 'false'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
