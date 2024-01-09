@@ -11,10 +11,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest 
+    
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      
 
     - name: Setup Dependencies
       run: |
@@ -25,6 +27,7 @@ jobs:
         sudo apt install -y wine-stable wine32 wine64 libwine libwine:i386 fonts-wine opencl-headers build-essential gcc g++ make flex bison libc6-dev libncurses5-dev libfreetype6-dev libxml2-dev libx11-dev libxext-dev libxrender-dev libxrandr-dev libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev libxss-dev libxt-dev libxv-dev libxcomposite-dev libxslt1-dev libosmesa6-dev libpcap0.8-dev libdbus-1-dev libncurses5-dev libncursesw5-dev libpulse-dev libaudio-dev libsdl2-dev libvulkan-dev libgnutls28-dev libncurses-dev libv4l-dev liblcms2-dev libtiff5-dev libmpg123-dev libopenal-dev libldap2-dev libcapi20-dev libcups2-dev libgphoto2-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libusb-1.0-0-dev libudev-dev libkrb5-dev ocl-icd-opencl-dev libgl1-mesa-dev libglu1-mesa-dev libosmesa6-dev libxcomposite-dev libxinerama-dev gcc-multilib g++-multilib libglu1-mesa-dev:i386 libosmesa6-dev:i386 libgl1-mesa-dri:i386 libgl1-mesa-glx:i386 mesa-vulkan-drivers:i386 libvulkan1:i386 libgnutls28-dev:i386 libwayland-dev libpcap-dev libpcsclite-dev libsane-dev libunwind-dev libfreetype6-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libxrandr-dev:i386 libxfixes-dev:i386 libxinerama-dev:i386 libxcomposite-dev:i386 libxrender-dev:i386 libasound2-dev:i386 libpulse-dev:i386 libdbus-1-dev:i386 libvulkan-dev:i386 libudev-dev:i386 libsdl2-dev:i386 libcups2-dev:i386 libfontconfig1-dev:i386
     - name: Clone Wine
       run: git clone git://source.winehq.org/git/wine.git ~/wine-dirs/wine
+      
 
     - name: Extract Wine Version
       id: wine_version
@@ -36,6 +39,7 @@ jobs:
           exit 1
         fi
         echo "::set-output name=version::$VERSION"
+        
 
     - name: Get Latest Release Version
       id: latest_release
@@ -43,6 +47,7 @@ jobs:
         LATEST_RELEASE_TAG=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name')
         echo "Latest release tag: $LATEST_RELEASE_TAG"
         echo "::set-output name=tag::$LATEST_RELEASE_TAG"
+        
 
     - name: Compare Versions
       id: compare_versions
@@ -53,6 +58,7 @@ jobs:
         else
           echo "::set-output name=should_skip::false"
         fi
+        
 
     - name: Build Wine64
       if: needs.compare_versions.outputs.should_skip == 'false'
@@ -62,6 +68,7 @@ jobs:
         ../wine-dirs/wine/configure --enable-win64  # Configure pour x86_64
         make -j$(nproc)
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
+        
 
     - name: Build Wine32
       if: needs.compare_versions.outputs.should_skip == 'false'
@@ -92,12 +99,7 @@ jobs:
         release_name: Wine ${{ steps.wine_version.outputs.version }}
         draft: false
         prerelease: false
-
-    - name: Print working directory before upload
-      run: |
-        pwd
-        ls -l
-        ls /home/runner/finalbuild
+        
 
     - name: Upload Wine as Release Asset
       if: needs.compare_versions.outputs.should_skip == 'false'
