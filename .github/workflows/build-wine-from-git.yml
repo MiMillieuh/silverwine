@@ -81,6 +81,25 @@ jobs:
         make -j$(nproc)
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
 
+
+    - name: Download Dependencies
+      run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace fedora /bin/bash -c "\
+          dnf install -y dnf-plugins-core && \
+          dnf install -y wine-devel && \
+          dnf repoquery --requires --resolve wine-devel | xargs dnf download --destdir /workspace/fedoradeps"
+
+    - name: Extract Dependencies
+      run: |
+         mkdir -p ${{ github.workspace }}/extracted-fedoradeps
+         for rpm in ${{ github.workspace }}/fedoradeps/*.rpm; do
+         rpm2cpio $rpm | cpio -idmv -D ${{ github.workspace }}/extracted-fedoradeps
+          done
+
+    - name: List Extracted Dependencies
+      run: ls -alh ${{ github.workspace }}/extracted-fedoradeps
+
+
     - name: Package Wine
       if: steps.compare_versions.outputs.should_skip == 'false'
       run: |
