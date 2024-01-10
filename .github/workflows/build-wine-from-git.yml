@@ -100,6 +100,18 @@ jobs:
     - name: List Extracted Dependencies
       run: ls -alh ${{ github.workspace }}/extracted-fedoradeps
 
+    - name: Copy Dependencies to build
+      run: |
+        mkdir -p ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/etc/ ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/lib/ ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/lib64/ ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/opt/ ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/sbin/ ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/usr/ ~/finalbuild/usr/local/deps
+        cp -r extracted-fedoradeps/var/ ~/finalbuild/usr/local/deps
+          done
+
 
     - name: Package Wine
       if: steps.compare_versions.outputs.should_skip == 'false'
