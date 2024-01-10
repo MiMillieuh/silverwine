@@ -110,8 +110,6 @@ jobs:
         cp -r extracted-fedoradeps/sbin/ ~/finalbuild/usr/local/deps
         cp -r extracted-fedoradeps/usr/ ~/finalbuild/usr/local/deps
         cp -r extracted-fedoradeps/var/ ~/finalbuild/usr/local/deps
-          done
-
 
     - name: Package Wine
       if: steps.compare_versions.outputs.should_skip == 'false'
