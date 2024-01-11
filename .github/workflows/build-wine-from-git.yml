@@ -54,7 +54,7 @@ jobs:
     - name: Compare Versions
       id: compare_versions
       run: |
-        if [ "silverwine-${{ steps.wine_version.outputs.version }}" = "silverwine-${{ steps.latest_release.outputs.tag }}" ]; then
+        if [ "silverwine-${{ steps.wine_version.outputs.version }}" = "${{ steps.latest_release.outputs.tag }}" ]; then
           echo "Version is the same as the latest release."
           echo "::set-output name=should_skip::true"
         else
