@@ -99,7 +99,7 @@ jobs:
          # done
 
     - name: List Extracted Dependencies
-      run: ls -alh ${{ github.workspace }}/extracted-fedoradeps
+      run: ls -alh ${{ github.workspace }} # ${{ github.workspace }}/extracted-fedoradeps
 
     - name: Copy Dependencies to build
       run: |
