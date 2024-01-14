@@ -87,8 +87,9 @@ jobs:
           docker run --rm -v ${{ github.workspace }}:/workspace fedora /bin/bash -c "\
           dnf install -y dnf-plugins-core && \
           dnf config-manager --add-repo https://dl.winehq.org/wine-builds/fedora/39/winehq.repo && \
-          dnf install -y wine-devel && \
-          dnf repoquery --requires --resolve wine-devel | xargs dnf download --destdir /workspace/fedoradeps"
+          # dnf install -y wine-devel && \
+          # dnf repoquery --requires --resolve wine-devel | xargs dnf download --destdir /workspace/fedoradeps"
+          dnf install wine-devel
 
     - name: Extract Dependencies
       run: |
@@ -104,12 +105,14 @@ jobs:
       run: |
         mkdir -p ~/finalbuild/usr/local/deps
         # cp -r extracted-fedoradeps/etc/ ~/finalbuild/usr/local/deps
-        cp -r extracted-fedoradeps/lib/ ~/finalbuild/usr/local/deps
-        cp -r extracted-fedoradeps/lib64/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/lib/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/lib64/ ~/finalbuild/usr/local/deps
         # cp -r extracted-fedoradeps/opt/ ~/finalbuild/usr/local/deps
         # cp -r extracted-fedoradeps/sbin/ ~/finalbuild/usr/local/deps
         # cp -r extracted-fedoradeps/usr/ ~/finalbuild/usr/local/deps
         # cp -r extracted-fedoradeps/var/ ~/finalbuild/usr/local/deps
+        cp -r /lib/ ~/finalbuild/usr/local/deps
+        cp -r /lib64/ ~/finalbuild/usr/local/deps
 
     - name: Package Wine
       if: steps.compare_versions.outputs.should_skip == 'false'
