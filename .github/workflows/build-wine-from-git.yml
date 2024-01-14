@@ -93,10 +93,10 @@ jobs:
 
     - name: Extract Dependencies
       run: |
-         mkdir -p ${{ github.workspace }}/extracted-fedoradeps
-         for rpm in ${{ github.workspace }}/fedoradeps/*.rpm; do
-         rpm2cpio $rpm | cpio -idmv -D ${{ github.workspace }}/extracted-fedoradeps
-          done
+         # mkdir -p ${{ github.workspace }}/extracted-fedoradeps
+         # for rpm in ${{ github.workspace }}/fedoradeps/*.rpm; do
+         # rpm2cpio $rpm | cpio -idmv -D ${{ github.workspace }}/extracted-fedoradeps
+         # done
 
     - name: List Extracted Dependencies
       run: ls -alh ${{ github.workspace }}/extracted-fedoradeps
