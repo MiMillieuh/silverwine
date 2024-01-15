@@ -95,8 +95,14 @@ jobs:
           ls /lib > ~/lib_after.txt && \
           ls /lib64 > ~/lib64_after.txt && \
           echo 'New libs list saved' && \
+          echo 'Checking differences in /lib' && \
           diff ~/lib_before.txt ~/lib_after.txt > ~/lib_diff.txt && \
+          echo 'Diff command for /lib completed with exit status $?' && \
+
+          echo 'Checking differences in /lib64' && \
           diff ~/lib64_before.txt ~/lib64_after.txt > ~/lib64_diff.txt && \
+          echo 'Diff command for /lib64 completed with exit status $?' && \
+
           echo 'Diff libs list saved' && \
           depsfolder=/workspace/deps && \
           mkdir -p \$depsfolder/lib && \
