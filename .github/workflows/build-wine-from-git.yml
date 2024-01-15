@@ -94,7 +94,7 @@ jobs:
           dnf install -y wine-devel && \
           ls /lib > ~/lib_after.txt && \
           ls /lib64 > ~/lib64_after.txt && \
-          echo 'New libs list saved' && \
+
 
 
           echo 'New libs list saved' && \
@@ -104,9 +104,17 @@ jobs:
           ls -l ~/lib_after.txt && \
 
           echo 'Checking differences in /lib' && \
-          diff ~/lib_before.txt ~/lib_after.txt > ~/lib_diff.txt 2> ~/lib_diff_errors.txt && \
+          diff ~/lib_before.txt ~/lib_after.txt > ~/lib_diff.txt || true && \
           echo 'Diff command for /lib completed with exit status $?' && \
-          cat ~/lib_diff_errors.txt && \
+
+          echo 'Checking existence of /lib64 before and after lists' && \
+          ls -l ~/lib64_before.txt && \
+          ls -l ~/lib64_after.txt && \
+
+          echo 'Checking differences in /lib64' && \
+          diff ~/lib64_before.txt ~/lib64_after.txt > ~/lib64_diff.txt || true && \
+          echo 'Diff command for /lib64 completed with exit status $?' && \
+
 
 
           echo 'Diff libs list saved' && \
