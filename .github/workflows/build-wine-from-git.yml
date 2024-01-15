@@ -122,10 +122,10 @@ jobs:
           mkdir -p \$depsfolder/lib && \
           mkdir -p \$depsfolder/lib64 && \
           grep '^>' ~/lib_diff.txt | sed 's/> //' | while read filename; do \
-              cp \"/lib/\$filename\" \"\$depsfolder/lib/\"; \
+              cp -r \"/lib/\$filename\" \"\$depsfolder/lib/\"; \
           done && \
           grep '^>' ~/lib64_diff.txt | sed 's/> //' | while read filename; do \
-              cp \"/lib64/\$filename\" \"\$depsfolder/lib64/\"; \
+              cp -r \"/lib64/\$filename\" \"\$depsfolder/lib64/\"; \
           done"
     - name: Copy Dependencies to build
       run: |
