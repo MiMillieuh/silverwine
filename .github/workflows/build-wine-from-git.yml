@@ -91,11 +91,41 @@ jobs:
           # dnf install -y wine-devel && \
           # dnf repoquery --requires --resolve wine-devel | xargs dnf download --destdir /workspace/fedoradeps
           dnf install -y wine-devel && \
-          ls /lib > ~/lib_after.txt && \
+          ls /lib > ~/lib_after.txt && \    - name: Download Dependencies
+      run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace fedora /bin/bash -c "\
+          dnf install -y dnf-plugins-core && \
+          dnf config-manager --add-repo https://dl.winehq.org/wine-builds/fedora/39/winehq.repo && \
+          # dnf install -y wine-devel && \
+          # dnf repoquery --requires --resolve wine-devel | xargs dnf download --destdir /workspace/fedoradeps
+          dnf install -y wine-devel"
+
+    - name: Extract Dependencies
+      run: |
+         # mkdir -p ${{ github.workspace }}/extracted-fedoradeps
+         # for rpm in ${{ github.workspace }}/fedoradeps/*.rpm; do
+         # rpm2cpio $rpm | cpio -idmv -D ${{ github.workspace }}/extracted-fedoradeps
+         # done
+
+    - name: List Extracted Dependencies
+      run: ls -alh ${{ github.workspace }} # ${{ github.workspace }}/extracted-fedoradeps
+
+    - name: Copy Dependencies to build
+      run: |
+        mkdir -p ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/etc/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/lib/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/lib64/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/opt/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/sbin/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/usr/ ~/finalbuild/usr/local/deps
+        # cp -r extracted-fedoradeps/var/ ~/finalbuild/usr/local/deps
+        cp -r /lib/ ~/finalbuild/usr/local/deps
+        cp -r /lib64/ ~/finalbuild/usr/local/deps
           ls /lib64 > ~/lib64_after.txt && \
           diff ~/lib_before.txt ~/lib_after.txt > ~/lib_diff.txt && \
           diff ~/lib64_before.txt ~/lib64_after.txt > ~/lib64_diff.txt && \
-          depsfolder=${{ github.workspace }}/deps && \
+          depsfolder=/workspace/deps && \
           mkdir -p \$depsfolder/lib && \
           mkdir -p \$depsfolder/lib64 && \
           grep '^>' ~/lib_diff.txt | sed 's/> //' | while read filename; do \
