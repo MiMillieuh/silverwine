@@ -93,10 +93,10 @@ jobs:
           dnf install -y wine-devel && \
           ls /lib > ~/lib_after.txt && \
           ls /lib64 > ~/lib64_after.txt && \
-          echo'New libs list saved' && \
+          echo 'New libs list saved' && \
           diff ~/lib_before.txt ~/lib_after.txt > ~/lib_diff.txt && \
           diff ~/lib64_before.txt ~/lib64_after.txt > ~/lib64_diff.txt && \
-          echo'Diff libs list saved' && \
+          echo 'Diff libs list saved' && \
           depsfolder=/workspace/deps && \
           mkdir -p \$depsfolder/lib && \
           mkdir -p \$depsfolder/lib64 && \
