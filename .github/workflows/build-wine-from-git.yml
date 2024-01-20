@@ -86,6 +86,7 @@ jobs:
         DESTDIR="$HOME/finalbuild" make -j$(nproc) install
 
     - name: Download and add Dependencies
+      if: steps.compare_versions.outputs.should_skip == 'false'
       run: |
           docker run --rm -v ${{ github.workspace }}:/workspace fedora /bin/bash -c "\
           dnf install -y dnf-plugins-core && \
@@ -132,6 +133,7 @@ jobs:
               cp -r \"/lib64/\$filename\" \"\$depsfolder/lib64/\"; \
           done"
     - name: Copy Dependencies to build
+      if: steps.compare_versions.outputs.should_skip == 'false'
       run: |
         mkdir -p ~/finalbuild/usr/local/deps
         cp -r ${{ github.workspace }}/deps/lib/ ~/finalbuild/usr/local/deps
