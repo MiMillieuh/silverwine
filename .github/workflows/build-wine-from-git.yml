@@ -16,7 +16,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      
+
+    - name: list debug
+      run: ls -la
 
     - name: Setup Dependencies
       run: |
