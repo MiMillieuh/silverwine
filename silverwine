@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO="MiMillieuh/silverwine-winebuilds"
+REPO="MiMillieuh/silverwine"
 API_URL="https://api.github.com/repos/$REPO/releases"
 DEST_DIR="/opt/silverwine/wine"
 VERSION_FILE="/opt/silverwine/winever"
