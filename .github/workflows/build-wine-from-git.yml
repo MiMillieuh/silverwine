@@ -18,7 +18,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: list debug
-      run: ls -la
+      run: | 
+        ls -la
+        echo $PWD
 
     - name: Setup Dependencies
       run: |
