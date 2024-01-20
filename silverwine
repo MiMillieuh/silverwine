@@ -36,6 +36,7 @@ download_and_extract() {
     echo "Downloading Winetricks..."
     sudo wget -O $DEST_DIR/bin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
     sudo chmod +x $DEST_DIR/bin/winetricks
+    sudo chmod +x $DEST_DIR/bin/silverwine
     configure_path
     echo "Installation of $2 completed successfully."
 }
