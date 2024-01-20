@@ -23,6 +23,14 @@ configure_path() {
 }
 
 download_and_extract() {
+    if [ -z "$DEST_DIR" ]; then
+    	echo "Path is empty. Exiting..."
+    	exit 1
+    fi
+    if [ -z "$TMP_DIR" ]; then
+    	echo "Path TMP is empty. Exiting..."
+    	exit 1
+    fi
     echo "Downloading $1..."
     sudo mkdir -p $TMP_DIR
     sudo curl -L $1 -o $TMP_DIR/release.tar.gz
