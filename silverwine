@@ -1,0 +1,122 @@
+#!/bin/bash
+
+REPO="MiMillieuh/silverwine-winebuilds"
+API_URL="https://api.github.com/repos/$REPO/releases"
+DEST_DIR="/opt/silverwine/wine"
+VERSION_FILE="/opt/silverwine/winever"
+TMP_DIR="/tmp/silverwine_download"
+ENV_FILE="/etc/environment.d/silverwine.conf"
+
+
+configure_path() {
+    echo "Configuring Env PATH in $ENV_FILE..."
+
+    if [ -f "$ENV_FILE" ]; then
+        echo "Env file : OK"
+    else
+        echo "Creating the env configuration file..."
+        sudo mkdir -p /etc/environment.d/
+        sudo touch $ENV_FILE
+        echo "PATH=\$PATH:$DEST_DIR/bin" | sudo tee $ENV_FILE
+	echo "Wine may not work until you restart to apply the Env configuration"
+    fi
+}
+
+download_and_extract() {
+    echo "Downloading $1..."
+    sudo mkdir -p $TMP_DIR
+    sudo curl -L $1 -o $TMP_DIR/release.tar.gz
+    echo "Clearing $DEST_DIR..."
+    sudo rm -rf $DEST_DIR/*
+    echo "Extracting to $DEST_DIR..."
+    sudo mkdir -p $DEST_DIR
+    sudo tar -xzf $TMP_DIR/release.tar.gz -C $DEST_DIR
+    sudo rm -rf $TMP_DIR
+    echo $2 | sudo tee $VERSION_FILE
+    echo "Downloading Winetricks..."
+    sudo wget -O $DEST_DIR/bin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+    sudo chmod +x $DEST_DIR/bin/winetricks
+    configure_path
+    echo "Installation of $2 completed successfully."
+}
+
+get_release_data() {
+    curl -s $API_URL | jq -r '.[] | "\(.tag_name) \(.assets[].browser_download_url)"'
+}
+
+list_versions() {
+    echo "Available versions:"
+    get_release_data | cut -d ' ' -f 1
+}
+
+show_menu() {
+    if [ -f "$VERSION_FILE" ]; then
+        echo "Currently installed version: $(cat $VERSION_FILE)"
+    else
+        echo "Currently installed version: None"
+    fi
+    echo "1. Download the latest version"
+    echo "2. Choose a specific version"
+    echo "3. List available versions"
+    echo "4. Exit"
+    read -p "Enter your choice: " choice
+
+    case $choice in
+        1)
+            release_data=$(get_release_data | head -n 1)
+            download_url=$(echo $release_data | cut -d ' ' -f 2)
+            latest_version=$(echo $release_data | cut -d ' ' -f 1)
+            download_and_extract $download_url $latest_version
+            ;;
+        2)
+            list_versions
+            read -p "Enter the desired version: " version
+            download_url=$(get_release_data | grep "^$version " | cut -d ' ' -f 2)
+            if [ -z "$download_url" ]; then
+                echo "Version not found."
+            else
+                download_and_extract $download_url $version
+            fi
+            ;;
+        3)
+            list_versions
+            ;;
+        4)
+            echo "Exiting..."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice."
+            ;;
+    esac
+}
+
+if [ "$1" == "list" ]; then
+    list_versions
+elif [ "$1" == "install" ]; then
+    if [ -z "$2" ]; then
+        echo "Please specify a version. For example:"
+        echo "$0 install latest"
+        echo "$0 install <version>"
+        exit 1
+    elif [ "$2" == "latest" ]; then
+        release_data=$(get_release_data | head -n 1)
+        download_url=$(echo $release_data | cut -d ' ' -f 2)
+        latest_version=$(echo $release_data | cut -d ' ' -f 1)
+        download_and_extract $download_url $latest_version
+        exit 0
+    else
+        version=$2
+        download_url=$(get_release_data | grep "^$version " | cut -d ' ' -f 2)
+        if [ -z "$download_url" ]; then
+            echo "Version not found."
+            exit 1
+        else
+            download_and_extract $download_url $version
+            exit 0
+        fi
+    fi
+else
+    show_menu
+fi
+
