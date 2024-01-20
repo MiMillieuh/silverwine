@@ -138,7 +138,7 @@ jobs:
         mkdir -p ~/finalbuild/usr/local/deps
         cp -r ${{ github.workspace }}/deps/lib/ ~/finalbuild/usr/local/deps
         cp -r ${{ github.workspace }}/deps/lib64/ ~/finalbuild/usr/local/deps
-        cp /home/runner/work/silverwine-winebuilds/silverwine-winebuilds/silverwine ~/finalbuild/usr/local/bin
+        cp /home/runner/work/silverwine/silverwine/silverwine ~/finalbuild/usr/local/bin
 
     - name: Package Wine
       if: steps.compare_versions.outputs.should_skip == 'false'
